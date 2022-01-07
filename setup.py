@@ -11,20 +11,18 @@ if __name__ == "__main__":
         r'FPDF_VERSION = "(\d+.\d+.\d+[^"]*)"', Path("fpdf/fpdf.py").read_text()
     )[0]
     setup(
-        name="fpdf2",
+        name="fpdf2-termica",
         version=version,
         description="Simple PDF generation for Python",
         long_description=Path("README.md").read_text(),
         long_description_content_type="text/markdown",
         author="Olivier PLATHEY ported by Max",
         author_email="maxpat78@yahoo.it",
-        maintainer="David Ankin",
-        maintainer_email="daveankin@gmail.com",
         url="https://pyfpdf.github.io/fpdf2/",
         download_url=f"https://github.com/PyFPDF/fpdf2/tarball/{version}",
         project_urls={
             "Documentation": "https://pyfpdf.github.io/fpdf2/",
-            "Code": "https://github.com/PyFPDF/fpdf2",
+            "Code": "https://github.com/TERMICA-DEVs/fpdf2",
             "Issue tracker": "https://github.com/PyFPDF/fpdf2/issues",
         },
         license="LGPLv3+",

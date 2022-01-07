@@ -200,6 +200,7 @@ class HTML2FPDF(HTMLParser):
         table_line_separators=False,
         ul_bullet_char=BULLET_WIN1252,
         heading_sizes=None,
+        break_line_spacing=None,
         **_,
     ):
         """
@@ -213,6 +214,7 @@ class HTML2FPDF(HTMLParser):
         """
         super().__init__()
         self.pdf = pdf
+        self.bls = break_line_spacing
         self.image_map = image_map or (lambda src: src)
         self.li_tag_indent = li_tag_indent
         self.table_line_separators = table_line_separators
@@ -404,9 +406,9 @@ class HTML2FPDF(HTMLParser):
         if tag == "a":
             self.href = attrs["href"]
         if tag == "br":
-            self.pdf.ln(self.h)
+            self.pdf.ln(self.vs)
         if tag == "p":
-            self.pdf.ln(self.h)
+            self.pdf.ln(self.vs)
             if attrs:
                 self.align = attrs.get("align")
         if tag in self.heading_sizes:
@@ -415,7 +417,7 @@ class HTML2FPDF(HTMLParser):
             hsize = self.heading_sizes[tag]
             self.pdf.set_text_color(150, 0, 0)
             self.set_font(size=hsize)
-            self.pdf.ln(self.h)
+            self.pdf.ln(self.vs)
             if attrs:
                 self.align = attrs.get("align")
         if tag == "hr":
@@ -434,7 +436,7 @@ class HTML2FPDF(HTMLParser):
             self.indent += 1
             self.bullet.append(0)
         if tag == "li":
-            self.pdf.ln(self.h + 2)
+            self.pdf.ln(self.vs + 2)
             self.pdf.set_text_color(190, 0, 0)
             bullet = self.bullet[self.indent - 1]
             if not isinstance(bullet, str):
@@ -562,7 +564,7 @@ class HTML2FPDF(HTMLParser):
             face, size, color = self.font_stack.pop()
             self.set_font(face, size)
             self.set_text_color(*color)
-            self.pdf.ln(self.h)
+            self.pdf.ln(self.vs)
             self.align = None
         if tag == "pre":
             face, size, color = self.font_stack.pop()
@@ -581,7 +583,7 @@ class HTML2FPDF(HTMLParser):
         if tag == "a":
             self.href = ""
         if tag == "p":
-            self.pdf.ln(self.h)
+            self.pdf.ln(self.vs)
             self.align = ""
         if tag in ("ul", "ol"):
             self.indent -= 1
@@ -593,7 +595,7 @@ class HTML2FPDF(HTMLParser):
             self.th = False
             self.theader = None
             self.tfooter = None
-            self.pdf.ln(self.h)
+            self.pdf.ln(self.vs)
             self.tr_index = None
         if tag == "thead":
             self.thead = None
@@ -633,6 +635,10 @@ class HTML2FPDF(HTMLParser):
         if size:
             self.font_size = size
             self.h = size / 72 * 25.4
+            if self.bls is None:
+                self.vs = self.h
+            else:
+                self.vs = self.bls
             LOGGER.debug("H %s", self.h)
         style = "".join(s for s in ("b", "i", "u") if self.style.get(s)).upper()
         if (self.font_face, style) != (self.pdf.font_family, self.pdf.font_style):
